@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大客流处置技能实操系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 36px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            margin: 0 5px;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .module {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .module.active {
+            display: block;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #667eea;
+        }
+
+        .question-card h3 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-card h3 span {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .question-text {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .answer-area {
+            margin-bottom: 20px;
+        }
+
+        .answer-area label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .answer-area textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .answer-area textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+
+        .feedback-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .correct-answer-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+        }
+
+        .correct-answer-box strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .correct-answer-text {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .step-container {
+            margin-bottom: 30px;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background: #667eea;
+        }
+
+        .step-number.locked {
+            background: #6c757d;
+        }
+
+        .step-number.completed {
+            background: #28a745;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .step-content {
+            display: none;
+            padding-left: 55px;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .step-content.locked {
+            display: block;
+            opacity: 0.5;
+        }
+
+        .locked-message {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.5s;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .location-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .location-card h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .method-list {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        .method-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .method-list li:last-child {
+            border-bottom: none;
+        }
+
+        .success-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #28a745;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .module-summary {
+            background: #e7f3ff;
+            border: 1px solid #b6d4fe;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .module-summary h4 {
+            color: #0c63e4;
+            margin-bottom: 15px;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0c63e4;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚇 大客流处置技能实操系统</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab(0)">模块一：客流控制判断</button>
+            <button class="tab" onclick="switchTab(1)">模块二：各位置处置</button>
+            <button class="tab" onclick="switchTab(2)">模块三：组织流程</button>
+        </div>
+
+        <div class="module active" id="module0">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress0"></div>
+            </div>
+            <div class="progress-text" id="progressText0">进度：0/2</div>
+
+            <div class="question-card" id="q1_1">
+                <h3><span>1</span>一级客流的启动时机</h3>
+                <div class="question-text">请描述一级客流控制的启动时机和标准。</div>
+                <div class="answer-area">
+                    <label>您的回答：</label>
+                    <textarea id="ans1_1" placeholder="请输入您的回答..."></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="checkAnswer('1_1')">提交答案</button>
+                <button class="btn btn-secondary" onclick="resetQuestion('1_1')">重置</button>
+                <div class="feedback" id="fb1_1"></div>
+            </div>
+
+            <div class="question-card" id="q1_2">
+                <h3><span>2</span>二级客流的启动时机</h3>
+                <div class="question-text">请描述二级客流控制的启动时机和标准。</div>
+                <div class="answer-area">
+                    <label>您的回答：</label>
+                    <textarea id="ans1_2" placeholder="请输入您的回答..."></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="checkAnswer('1_2')">提交答案</button>
+                <button class="btn btn-secondary" onclick="resetQuestion('1_2')">重置</button>
+                <div class="feedback" id="fb1_2"></div>
+            </div>
+
+            <div class="module-summary" id="summary0" style="display:none;">
+                <h4>🎉 模块一完成</h4>
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="score0">0</span>
+                        <span class="stat-label">得分</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="correct0">0</span>
+                        <span class="stat-label">正确</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="wrong0">0</span>
+                        <span class="stat-label">错误</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="margin-top:15px;" onclick="resetModule(0)">重新练习</button>
+            </div>
+        </div>
+
+        <div class="module" id="module1">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress1"></div>
+            </div>
+            <div class="progress-text" id="progressText1">进度：0/5</div>
+
+            <div class="location-grid">
+                <div class="location-card" id="loc1">
+                    <h4>🎫 问题：大客流时，在购票机处如何处置？</h4>
+                    <div class="answer-area">
+                        <label>您的回答：</label>
+                        <textarea id="ans2_1" placeholder="请输入您的回答..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="checkLocation('2_1')">提交答案</button>
+                    <button class="btn btn-secondary" onclick="resetQuestion('2_1')">重置</button>
+                    <div class="feedback" id="fb2_1"></div>
+                </div>
+
+                <div class="location-card" id="loc2">
+                    <h4>🛂 问题：大客流时，在安检机处如何处置？</h4>
+                    <div class="answer-area">
+                        <label>您的回答：</label>
+                        <textarea id="ans2_2" placeholder="请输入您的回答..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="checkLocation('2_2')">提交答案</button>
+                    <button class="btn btn-secondary" onclick="resetQuestion('2_2')">重置</button>
+                    <div class="feedback" id="fb2_2"></div>
+                </div>
+
+                <div class="location-card" id="loc3">
+                    <h4>🚪 问题：大客流时，在进站闸机处如何处置？</h4>
+                    <div class="answer-area">
+                        <label>您的回答：</label>
+                        <textarea id="ans2_3" placeholder="请输入您的回答..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="checkLocation('2_3')">提交答案</button>
+                    <button class="btn btn-secondary" onclick="resetQuestion('2_3')">重置</button>
+                    <div class="feedback" id="fb2_3"></div>
+                </div>
+
+                <div class="location-card" id="loc4">
+                    <h4>🚶 问题：大客流时，在出站闸机处如何处置？</h4>
+                    <div class="answer-area">
+                        <label>您的回答：</label>
+                        <textarea id="ans2_4" placeholder="请输入您的回答..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="checkLocation('2_4')">提交答案</button>
+                    <button class="btn btn-secondary" onclick="resetQuestion('2_4')">重置</button>
+                    <div class="feedback" id="fb2_4"></div>
+                </div>
+
+                <div class="location-card" id="loc5">
+                    <h4>🚀 问题：大客流时，在出站方向楼扶梯处如何处置？</h4>
+                    <div class="answer-area">
+                        <label>您的回答：</label>
+                        <textarea id="ans2_5" placeholder="请输入您的回答..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="checkLocation('2_5')">提交答案</button>
+                    <button class="btn btn-secondary" onclick="resetQuestion('2_5')">重置</button>
+                    <div class="feedback" id="fb2_5"></div>
+                </div>
+            </div>
+
+            <div class="module-summary" id="summary1" style="display:none;">
+                <h4>🎉 模块二完成</h4>
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="score1">0</span>
+                        <span class="stat-label">得分</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="correct1">0</span>
+                        <span class="stat-label">正确</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="wrong1">0</span>
+                        <span class="stat-label">错误</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="margin-top:15px;" onclick="resetModule(1)">重新练习</button>
+            </div>
+        </div>
+
+        <div class="module" id="module2">
+            <div style="margin-bottom: 30px;">
+                <label style="font-size: 18px; font-weight: bold; margin-right: 20px;">选择客流控制级别：</label>
+                <select id="flowLevel" onchange="switchFlowLevel()" style="padding: 10px 20px; border-radius: 8px; font-size: 16px;">
+                    <option value="first">一级客流控制</option>
+                    <option value="second">二级客流控制</option>
+                </select>
+            </div>
+
+            <div id="firstLevel" style="display:block;">
+                <h3 style="color:#667eea; margin-bottom:20px;">一级客流控制 - 处置方法及组织流程</h3>
+                
+                <div class="question-card" style="margin-bottom:30px;">
+                    <h3><span>*</span>处置方法</h3>
+                    <div class="question-text">请描述一级客流控制的处置方法。</div>
+                    <div class="answer-area">
+                        <label>您的回答：</label>
+                        <textarea id="ans3_f1" placeholder="请输入您的回答..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="checkDisposal('f1')">提交答案</button>
+                    <button class="btn btn-secondary" onclick="resetQuestion('3_f1')">重置</button>
+                    <div class="feedback" id="fb3_f1"></div>
+                </div>
+
+                <div class="step-container">
+                    <h3 style="color:#333; margin-bottom:20px;">组织流程（三步）</h3>
+                    
+                    <div class="step-header">
+                        <div class="step-number" id="stepF1">1</div>
+                        <span class="step-title">启动阶段</span>
+                    </div>
+                    <div class="step-content active" id="contentF1">
+                        <div class="question-card">
+                            <div class="question-text">第一步：一级客流控制的启动流程是什么？</div>
+                            <div class="answer-area">
+                                <label>您的回答：</label>
+                                <textarea id="ans3_f2" placeholder="请输入您的回答..."></textarea>
+                            </div>
+                            <button class="btn btn-primary" onclick="checkStep('f2', 1)">提交答案</button>
+                            <button class="btn btn-secondary" onclick="resetQuestion('3_f2')">重置</button>
+                            <div class="feedback" id="fb3_f2"></div>
+                        </div>
+                    </div>
+
+                    <div class="step-header">
+                        <div class="step-number locked" id="stepF2">2</div>
+                        <span class="step-title">实施阶段</span>
+                    </div>
+                    <div class="step-content locked" id="contentF2">
+                        <div class="locked-message">✋ 请先完成第一步</div>
+                        <div class="question-card" style="display:none;">
+                            <div class="question-text">第二步：一级客流控制的实施流程是什么？</div>
+                            <div class="answer-area">
+                                <label>您的回答：</label>
+                                <textarea id="ans3_f3" placeholder="请输入您的回答..."></textarea>
+                            </div>
+                            <button class="btn btn-primary" onclick="checkStep('f3', 2)">提交答案</button>
+                            <button class="btn btn-secondary" onclick="resetQuestion('3_f3')">重置</button>
+                            <div class="feedback" id="fb3_f3"></div>
+                        </div>
+                    </div>
+
+                    <div class="step-header">
+                        <div class="step-number locked" id="stepF3">3</div>
+                        <span class="step-title">取消阶段</span>
+                    </div>
+                    <div class="step-content locked" id="contentF3">
+                        <div class="locked-message">✋ 请先完成第二步</div>
+                        <div class="question-card" style="display:none;">
+                            <div class="question-text">第三步：一级客流控制的取消流程是什么？</div>
+                            <div class="answer-area">
+                                <label>您的回答：</label>
+                                <textarea id="ans3_f4" placeholder="请输入您的回答..."></textarea>
+                            </div>
+                            <button class="btn btn-primary" onclick="checkStep('f4', 3)">提交答案</button>
+                            <button class="btn btn-secondary" onclick="resetQuestion('3_f4')">重置</button>
+                            <div class="feedback" id="fb3_f4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="secondLevel" style="display:none;">
+                <h3 style="color:#667eea; margin-bottom:20px;">二级客流控制 - 处置方法及组织流程</h3>
+                
+                <div class="question-card" style="margin-bottom:30px;">
+                    <h3><span>*</span>处置方法</h3>
+                    <div class="question-text">请描述二级客流控制的处置方法。</div>
+                    <div class="answer-area">
+                        <label>您的回答：</label>
+                        <textarea id="ans3_s1" placeholder="请输入您的回答..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="checkDisposal('s1')">提交答案</button>
+                    <button class="btn btn-secondary" onclick="resetQuestion('3_s1')">重置</button>
+                    <div class="feedback" id="fb3_s1"></div>
+                </div>
+
+                <div class="step-container">
+                    <h3 style="color:#333; margin-bottom:20px;">组织流程（三步）</h3>
+                    
+                    <div class="step-header">
+                        <div class="step-number" id="stepS1">1</div>
+                        <span class="step-title">启动阶段</span>
+                    </div>
+                    <div class="step-content active" id="contentS1">
+                        <div class="question-card">
+                            <div class="question-text">第一步：二级客流控制的启动流程是什么？</div>
+                            <div class="answer-area">
+                                <label>您的回答：</label>
+                                <textarea id="ans3_s2" placeholder="请输入您的回答..."></textarea>
+                            </div>
+                            <button class="btn btn-primary" onclick="checkStep('s2', 1)">提交答案</button>
+                            <button class="btn btn-secondary" onclick="resetQuestion('3_s2')">重置</button>
+                            <div class="feedback" id="fb3_s2"></div>
+                        </div>
+                    </div>
+
+                    <div class="step-header">
+                        <div class="step-number locked" id="stepS2">2</div>
+                        <span class="step-title">实施阶段</span>
+                    </div>
+                    <div class="step-content locked" id="contentS2">
+                        <div class="locked-message">✋ 请先完成第一步</div>
+                        <div class="question-card" style="display:none;">
+                            <div class="question-text">第二步：二级客流控制的实施流程是什么？</div>
+                            <div class="answer-area">
+                                <label>您的回答：</label>
+                                <textarea id="ans3_s3" placeholder="请输入您的回答..."></textarea>
+                            </div>
+                            <button class="btn btn-primary" onclick="checkStep('s3', 2)">提交答案</button>
+                            <button class="btn btn-secondary" onclick="resetQuestion('3_s3')">重置</button>
+                            <div class="feedback" id="fb3_s3"></div>
+                        </div>
+                    </div>
+
+                    <div class="step-header">
+                        <div class="step-number locked" id="stepS3">3</div>
+                        <span class="step-title">取消阶段</span>
+                    </div>
+                    <div class="step-content locked" id="contentS3">
+                        <div class="locked-message">✋ 请先完成第二步</div>
+                        <div class="question-card" style="display:none;">
+                            <div class="question-text">第三步：二级客流控制的取消流程是什么？</div>
+                            <div class="answer-area">
+                                <label>您的回答：</label>
+                                <textarea id="ans3_s4" placeholder="请输入您的回答..."></textarea>
+                            </div>
+                            <button class="btn btn-primary" onclick="checkStep('s4', 3)">提交答案</button>
+                            <button class="btn btn-secondary" onclick="resetQuestion('3_s4')">重置</button>
+                            <div class="feedback" id="fb3_s4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-summary" id="summary2" style="display:none;">
+                <h4>🎉 模块三完成</h4>
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="score2">0</span>
+                        <span class="stat-label">得分</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="correct2">0</span>
+                        <span class="stat-label">正确</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="wrong2">0</span>
+                        <span class="stat-label">错误</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="margin-top:15px;" onclick="resetModule(2)">重新练习</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const correctAnswers = {
+            '1_1': {
+                keywords: ['岛式站台', '单侧', '1/2', '两侧', '1/3', '侧式站台', '2/3', '付费区', '2/3'],
+                requiredGroups: [
+                    ['经过2-3趟车仍上车困难', '两三趟车仍无法上车', '连续2-3趟车都上不去', '2-3趟车仍上车困难', '两三趟车仍上车困难'],
+                    ['持续增长趋势', '持续增加', '不断增长', '继续增加', '有增长趋势', '持续上升']
+                ],
+                answer: '（1）岛式站台，单侧站台门前排队人数到达站台宽度的1/2即达到警戒线,或两侧站台门前同时排队人数到达站台宽度的1/3即达到警戒线，且经过2-3趟车仍上车困难时；侧式站台站台门前排队人数到达站台宽度的2/3即达到警戒线，且经过2-3趟车仍上车困难时；（2）付费区乘客堆积，站厅付费区堆积乘客数量达到付费区面积的2/3以上即达到警戒线，且有持续增长趋势；'
+            },
+            '1_2': {
+                keywords: ['安检', '1/2', '非付费区', '2/3', '换乘站', '绕行', '越站'],
+                requiredGroups: [
+                    ['持续增长趋势', '持续增加', '不断增长', '继续增加', '有增长趋势', '持续上升']
+                ],
+                answer: '（1）安检处排队进站乘客经引导且铁马绕行后，排队等候进站的乘客达到出入口通道长度1/2即达到警戒线，且有持续增长趋势；（2）非付费区乘客堆积，达到非付费区面积的2/3时即达到警戒线，且有持续增长趋势；（3）换乘站经站厅绕行到达站台仍无法上车时即达到警戒线，且有持续增长趋势；'
+            },
+            '2_1': {
+                keywords: ['购票流线', '引导', '补币补票', '设备维修', '预制票', '支付宝', '青岛地铁APP'],
+                requiredGroups: [
+                    ['购票流线', '购票引导', '规范购票'],
+                    ['补币补票', '补币', '补票'],
+                    ['设备维修', '维修设备', '修理设备'],
+                    ['预制票', '支付宝', '青岛地铁APP', '扫码购票']
+                ],
+                answer: '（1）规范购票流线，加强引导；（2）及时补币补票；（3）加快设备维修；（4）增售预制票，引导乘客使用支付宝或者下载青岛地铁APP等。'
+            },
+            '2_2': {
+                keywords: ['无包通道', '双手检', '安检提速', '移动安检', '安检人员'],
+                requiredGroups: [
+                    ['无包通道', '双手检', '开双手检'],
+                    ['安检提速', '提速'],
+                    ['移动安检', '安检人员', '增设安检']
+                ],
+                answer: '（1）开辟无包通道，开双手检；（2）安检提速；（3）增设移动安检设备及安检人员等。'
+            },
+            '2_3': {
+                keywords: ['人员引导', '事务处理', '报修', '双向闸机', '移动闸机', '断电', '扇门常开'],
+                requiredGroups: [
+                    ['人员引导', '事务处理', '引导乘客'],
+                    ['报修', '故障维修', '维修'],
+                    ['双向闸机', '移动闸机'],
+                    ['断电', '扇门常开', '常开']
+                ],
+                answer: '（1）加强人员引导，加快乘客事务处理；（2）及时报修，加快故障维修；（3）启用双向闸机、增加移动闸机；（4）通过设备断电方式使闸机扇门常开。'
+            },
+            '2_4': {
+                keywords: ['人员引导', '工作卡', '报修', '边门', '单程票', '双向闸机', '移动闸机', '大客流模式', '断电', '扇门常开'],
+                requiredGroups: [
+                    ['人员引导', '工作卡'],
+                    ['报修', '故障维修'],
+                    ['边门', '单程票'],
+                    ['双向闸机', '移动闸机'],
+                    ['大客流模式', '断电', '扇门常开']
+                ],
+                answer: '（1）站厅增加人员引导，配置特殊工作卡；（2）及时报修，加快闸机故障维修；（3）开启边门，单程票回收；（4）启用双向闸机、增加移动闸机；（5）部分线路执行闸机大客流模式，或通过设备断电方式使闸机扇门常开。'
+            },
+            '2_5': {
+                keywords: ['人员引导', '扶梯方向', '出站', '扶梯监控', '抢修', '公安', '交警', '调流'],
+                requiredGroups: [
+                    ['人员引导', '扶梯方向', '调整扶梯'],
+                    ['扶梯监控', '抢修', '故障抢修'],
+                    ['公安', '交警', '调流', '地面调流']
+                ],
+                answer: '（1）站台/出入口楼扶梯处增加人员引导，调整扶梯方向为出站；（2）加强扶梯监控，故障加快抢修；（3）因路面交通拥挤导致的楼扶梯疏散能力不足，申请地面公安、交警地面调流，并在扶梯出口增加人员引导，防止人员堵塞扶梯出口。'
+            },
+            '3_f1': {
+                keywords: ['安检', '绕行', '控放', '分批', '关闭售票机', '关闭闸机', '关闭扶梯', '扶梯改出站', '换乘站', '换乘通道', '越站'],
+                requiredGroups: [
+                    ['安检点', '安检绕行', '绕行'],
+                    ['控放', '分批', '分批进站', '分批安检'],
+                    ['关闭售票机', '关闭闸机', '关闭扶梯', '扶梯改出站', '走楼梯'],
+                    ['换乘站', '换乘通道', '越站', '换乘客流']
+                ],
+                answer: '（1）安检点增加绕行；（2）“控、放”结合，分批安检进站；（3）紧急情况下，采取关闭部分自动售票机；关闭部分进站闸机或进站扶梯；将进站扶梯改为出站，引导乘客走楼梯；（4）换乘站在安检处控制进站，组织换乘客流至站厅绕行、分批放行；单向或双向关闭换乘通道；紧急情况申请越站。'
+            },
+            '3_f2': {
+                keywords: ['值班站长', '启动', '行值', 'OCC', '汇报'],
+                answer: '值班站长负责一级客流控制的启动，行值向OCC汇报信息。'
+            },
+            '3_f3': {
+                keywords: ['值班站长', '组织', '各岗位', '配合', '出站疏导', '乘降有序'],
+                answer: '值班站长组织各岗位人员相互配合实施，做好一级客流控制，同时做好出站客流疏导，保障乘客乘降有序。'
+            },
+            '3_f4': {
+                keywords: ['客流控制', '减少', '值班站长', '取消', '行值', 'OCC', '汇报'],
+                answer: '车站客流得到控制，站台和付费区客流减少后，值班站长负责取消一级客流控制，行值向OCC汇报取消。'
+            },
+            '3_s1': {
+                keywords: ['出入口', '铁马绕行', '控放', '分批', '单向', '关闭出入口', '换乘站', '越站'],
+                requiredGroups: [
+                    ['出入口', '铁马绕行', '绕行'],
+                    ['控放', '分批', '分批进站'],
+                    ['单向', '关闭出入口', '单向开放'],
+                    ['换乘站', '越站', '双方向越站']
+                ],
+                answer: '（1）出入口外组织乘客铁马绕行；（2）“控、放”结合，分批进站；（3）根据客流组织需要将出入口设置为“单向”开放；紧急情况下关闭出入口；（4）换乘站在出入口采取客流控制后，持续等待进站的乘客仍不断增加，紧急情况申请列车双方向越站并关闭出入口。'
+            },
+            '3_s2': {
+                keywords: ['站区长', '副站区长', '启动', '行值', 'OCC', 'MMCC', '驻站公安'],
+                answer: '站区长/副站区长负责二级客流控制的启动，行值向OCC汇报，OCC负责向MMCC汇报；车站将二级客流控制信息告知驻站公安，驻站公安协助组织。'
+            },
+            '3_s3': {
+                keywords: ['一级客控', '基础', '二级客控', '出站疏导', '乘降有序'],
+                answer: '车站在一级客控的基础上，采取二级客流控制措施，同时做好出站客流疏导，保证乘客乘降有序。'
+            },
+            '3_s4': {
+                keywords: ['客流控制', '减少', '站区长', '副站区长', '取消', '行值', 'OCC', 'MMCC', '汇报'],
+                answer: '车站客流得到控制，站内客流减少后，站区长/副站区长取消车站客流控制。行值向OCC汇报，OCC向MMCC汇报。'
+            }
+        };
+
+        const moduleStats = [
+            { total: 2, correct: 0, answered: 0 },
+            { total: 5, correct: 0, answered: 0 },
+            { total: 4, correct: 0, answered: 0 }
+        ];
+
+        const stepStatus = {
+            first: { step1: false, step2: false, step3: false },
+            second: { step1: false, step2: false, step3: false }
+        };
+
+        function switchTab(index) {
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('active', i === index);
+            });
+            document.querySelectorAll('.module').forEach((m, i) => {
+                m.classList.toggle('active', i === index);
+            });
+        }
+
+        function switchFlowLevel() {
+            const level = document.getElementById('flowLevel').value;
+            document.getElementById('firstLevel').style.display = level === 'first' ? 'block' : 'none';
+            document.getElementById('secondLevel').style.display = level === 'second' ? 'block' : 'none';
+            resetModule(2);
+        }
+
+        function checkAnswer(key) {
+            const userAns = document.getElementById(`ans${key}`).value.trim();
+            if (!userAns) {
+                alert('请输入答案后再提交！');
+                return;
+            }
+
+            const correct = correctAnswers[key];
+            let matchCount = 0;
+            
+            correct.keywords.forEach(kw => {
+                if (userAns.includes(kw)) {
+                    matchCount++;
+                }
+            });
+
+            const threshold = Math.floor(correct.keywords.length * 0.6);
+            let isCorrect = matchCount >= threshold;
+            
+            if (correct.requiredGroups) {
+                correct.requiredGroups.forEach(group => {
+                    let groupMatched = false;
+                    group.forEach(kw => {
+                        if (userAns.includes(kw)) {
+                            groupMatched = true;
+                        }
+                    });
+                    if (!groupMatched) {
+                        isCorrect = false;
+                    }
+                });
+            }
+            
+            showFeedback(key, isCorrect, correct.answer);
+            
+            if (key.startsWith('1_')) {
+                updateModuleStats(0, isCorrect);
+            }
+        }
+
+        function checkLocation(key) {
+            const userAns = document.getElementById(`ans${key}`).value.trim();
+            if (!userAns) {
+                alert('请输入答案后再提交！');
+                return;
+            }
+
+            const correct = correctAnswers[key];
+            let matchCount = 0;
+            
+            correct.keywords.forEach(kw => {
+                if (userAns.includes(kw)) {
+                    matchCount++;
+                }
+            });
+
+            const threshold = Math.floor(correct.keywords.length * 0.4);
+            let isCorrect = matchCount >= threshold;
+            
+            if (correct.requiredGroups) {
+                correct.requiredGroups.forEach(group => {
+                    let groupMatched = false;
+                    group.forEach(kw => {
+                        if (userAns.includes(kw)) {
+                            groupMatched = true;
+                        }
+                    });
+                    if (!groupMatched) {
+                        isCorrect = false;
+                    }
+                });
+            }
+            
+            showFeedback(key, isCorrect, correct.answer);
+            updateModuleStats(1, isCorrect);
+        }
+
+        function checkDisposal(key) {
+            const userAns = document.getElementById(`ans3_${key}`).value.trim();
+            if (!userAns) {
+                alert('请输入答案后再提交！');
+                return;
+            }
+
+            const correct = correctAnswers[`3_${key}`];
+            let matchCount = 0;
+            
+            correct.keywords.forEach(kw => {
+                if (userAns.includes(kw)) {
+                    matchCount++;
+                }
+            });
+
+            const threshold = Math.floor(correct.keywords.length * 0.4);
+            let isCorrect = matchCount >= threshold;
+            
+            if (correct.requiredGroups) {
+                correct.requiredGroups.forEach(group => {
+                    let groupMatched = false;
+                    group.forEach(kw => {
+                        if (userAns.includes(kw)) {
+                            groupMatched = true;
+                        }
+                    });
+                    if (!groupMatched) {
+                        isCorrect = false;
+                    }
+                });
+            }
+            
+            showFeedback(`3_${key}`, isCorrect, correct.answer);
+            
+            if (isCorrect) {
+                const level = document.getElementById('flowLevel').value;
+                if (level === 'first') {
+                    document.getElementById('stepF1').classList.remove('locked');
+                    document.getElementById('contentF1').classList.remove('locked');
+                } else {
+                    document.getElementById('stepS1').classList.remove('locked');
+                    document.getElementById('contentS1').classList.remove('locked');
+                }
+            }
+        }
+
+        function checkStep(key, stepNum) {
+            const userAns = document.getElementById(`ans3_${key}`).value.trim();
+            if (!userAns) {
+                alert('请输入答案后再提交！');
+                return;
+            }
+
+            const correct = correctAnswers[`3_${key}`];
+            let matchCount = 0;
+            
+            correct.keywords.forEach(kw => {
+                if (userAns.includes(kw)) {
+                    matchCount++;
+                }
+            });
+
+            const threshold = Math.floor(correct.keywords.length * 0.6);
+            const isCorrect = matchCount >= threshold;
+            
+            showFeedback(`3_${key}`, isCorrect, correct.answer);
+            
+            if (isCorrect) {
+                const level = document.getElementById('flowLevel').value;
+                const prefix = level === 'first' ? 'F' : 'S';
+                
+                document.getElementById(`step${prefix}${stepNum}`).classList.add('completed');
+                
+                if (stepNum < 3) {
+                    document.getElementById(`step${prefix}${stepNum + 1}`).classList.remove('locked');
+                    const nextContent = document.getElementById(`content${prefix}${stepNum + 1}`);
+                    nextContent.classList.remove('locked');
+                    nextContent.querySelector('.locked-message').style.display = 'none';
+                    nextContent.querySelector('.question-card').style.display = 'block';
+                }
+                
+                moduleStats[2].answered++;
+                moduleStats[2].correct++;
+                
+                if (moduleStats[2].answered === 4 && moduleStats[2].correct === 4) {
+                    document.getElementById('summary2').style.display = 'block';
+                    document.getElementById('score2').innerText = 100;
+                    document.getElementById('correct2').innerText = 4;
+                    document.getElementById('wrong2').innerText = 0;
+                }
+            }
+        }
+
+        function showFeedback(key, isCorrect, correctAnswer) {
+            const fb = document.getElementById(`fb${key}`);
+            fb.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            
+            if (isCorrect) {
+                fb.innerHTML = `
+                    <span class="feedback-icon">✓</span><strong>回答正确！</strong>您的回答符合标准答案要求。
+                    <div style="margin-top:15px;">
+                        <button class="btn btn-secondary" style="padding:8px 16px;font-size:14px;" onclick="toggleAnswer('${key}')">查看答案</button>
+                    </div>
+                    <div id="answerBox${key}" style="display:none;" class="correct-answer-box">
+                        <strong>正确答案：</strong>
+                        <div class="correct-answer-text">${correctAnswer}</div>
+                    </div>
+                `;
+            } else {
+                fb.innerHTML = `
+                    <span class="feedback-icon">✗</span><strong>回答错误！</strong>您的回答未达到标准要求。
+                    <div class="correct-answer-box">
+                        <strong>正确答案：</strong>
+                        <div class="correct-answer-text">${correctAnswer}</div>
+                    </div>
+                `;
+            }
+            
+            fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function toggleAnswer(key) {
+            const box = document.getElementById(`answerBox${key}`);
+            if (box.style.display === 'none') {
+                box.style.display = 'block';
+            } else {
+                box.style.display = 'none';
+            }
+        }
+
+        function resetQuestion(key) {
+            document.getElementById(`ans${key}`).value = '';
+            document.getElementById(`fb${key}`).className = 'feedback';
+            document.getElementById(`fb${key}`).innerHTML = '';
+        }
+
+        function updateModuleStats(moduleIndex, isCorrect) {
+            moduleStats[moduleIndex].answered++;
+            if (isCorrect) moduleStats[moduleIndex].correct++;
+            
+            const progress = (moduleStats[moduleIndex].answered / moduleStats[moduleIndex].total) * 100;
+            document.getElementById(`progress${moduleIndex}`).style.width = `${progress}%`;
+            document.getElementById(`progressText${moduleIndex}`).innerText = 
+                `进度：${moduleStats[moduleIndex].answered}/${moduleStats[moduleIndex].total}`;
+            
+            if (moduleStats[moduleIndex].answered === moduleStats[moduleIndex].total) {
+                document.getElementById(`summary${moduleIndex}`).style.display = 'block';
+                document.getElementById(`score${moduleIndex}`).innerText = 
+                    Math.round((moduleStats[moduleIndex].correct / moduleStats[moduleIndex].total) * 100);
+                document.getElementById(`correct${moduleIndex}`).innerText = moduleStats[moduleIndex].correct;
+                document.getElementById(`wrong${moduleIndex}`).innerText = 
+                    moduleStats[moduleIndex].answered - moduleStats[moduleIndex].correct;
+            }
+        }
+
+        function resetModule(moduleIndex) {
+            moduleStats[moduleIndex] = { total: moduleIndex === 2 ? 4 : (moduleIndex === 0 ? 2 : 5), correct: 0, answered: 0 };
+            
+            if (moduleIndex === 0) {
+                resetQuestion('1_1');
+                resetQuestion('1_2');
+            } else if (moduleIndex === 1) {
+                resetQuestion('2_1');
+                resetQuestion('2_2');
+                resetQuestion('2_3');
+                resetQuestion('2_4');
+                resetQuestion('2_5');
+            } else {
+                resetQuestion('3_f1');
+                resetQuestion('3_f2');
+                resetQuestion('3_f3');
+                resetQuestion('3_f4');
+                resetQuestion('3_s1');
+                resetQuestion('3_s2');
+                resetQuestion('3_s3');
+                resetQuestion('3_s4');
+                
+                stepStatus.first = { step1: false, step2: false, step3: false };
+                stepStatus.second = { step1: false, step2: false, step3: false };
+                
+                ['F1', 'F2', 'F3', 'S1', 'S2', 'S3'].forEach(id => {
+                    const el = document.getElementById(`step${id}`);
+                    el.classList.remove('completed');
+                    el.classList.add('locked');
+                });
+                
+                ['F1', 'F2', 'F3', 'S1', 'S2', 'S3'].forEach(id => {
+                    const content = document.getElementById(`content${id}`);
+                    content.classList.add('locked');
+                    content.querySelector('.locked-message').style.display = 'block';
+                    content.querySelector('.question-card').style.display = 'none';
+                });
+                
+                document.getElementById('stepF1').classList.remove('locked');
+                document.getElementById('contentF1').classList.remove('locked');
+                document.getElementById('contentF1').querySelector('.locked-message').style.display = 'none';
+                document.getElementById('contentF1').querySelector('.question-card').style.display = 'block';
+            }
+            
+            document.getElementById(`progress${moduleIndex}`).style.width = '0%';
+            document.getElementById(`progressText${moduleIndex}`).innerText = `进度：0/${moduleStats[moduleIndex].total}`;
+            document.getElementById(`summary${moduleIndex}`).style.display = 'none';
+        }
+
+        document.getElementById('stepF1').classList.remove('locked');
+        document.getElementById('contentF1').classList.remove('locked');
+    </script>
+</body>
+</html>
